@@ -1,0 +1,21 @@
+{% if latest_reviews_list %}
+<ul>
+    {% for review in latest_reviews_list %}
+    <li><a href="/{{ review.id }}/review">{{ review.text }}</a></li>
+        {% if review.opinion_set.count > 0%}
+            <ul>
+            {% for opinion in review.opinion_set.all %}
+                <li>
+                    <ol>
+                        <li><a href="/{{opinion.id}}/opinion">{{ opinion.text }}</a>
+                            <br /> score: {{ opinion.id }}
+                        </li>
+            {% endfor %}
+        {% else %}
+            <p>No opinions are available.</p>
+        {% endif %}
+    {% endfor %}
+</ul>
+{% else %}
+    <p>No reviews are available.</p>
+{% endif %}
