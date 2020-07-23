@@ -19,4 +19,5 @@ py==1.8.1
 pyparsing==2.4.7
 pytest==5.4.1
 wcwidth==0.1.9
-djangorestframework=3.11.0
+djangorestframework==3.11.0
+requests

@@ -8,11 +8,12 @@ class MLRegistry:
         self.endpoints = {}
 
     def add_algorithm(self, endpoint_name, algorithm_object, algorithm_name,
-                    algorithm_status, algorithm_version, owner,
-                    algorithm_description, algorithm_code):
+                      algorithm_status, algorithm_version, owner,
+                      algorithm_description, algorithm_code):
         # get endpoint
-        endpoint, _ = Endpoint.objects.get_or_create(name=endpoint_name, owner=owner)
-
+        endpoint, _ = Endpoint.objects.get_or_create(
+            name=endpoint_name, owner=owner)
+        # TODO work out how to avoid adding multiple endpoints with the same name  # noqa 501
         # get algorithm
         database_object, algorithm_created = MLAlgorithm.objects.get_or_create(
                 name=algorithm_name,
@@ -22,10 +23,11 @@ class MLRegistry:
                 owner=owner,
                 parent_endpoint=endpoint)
         if algorithm_created:
-            status = MLAlgorithmStatus(status = algorithm_status,
-                                        created_by = owner,
-                                        parent_mlalgorithm = database_object,
-                                        active = True)
+            status = MLAlgorithmStatus(
+                status=algorithm_status,
+                created_by=owner,
+                parent_mlalgorithm=database_object,
+                active=True)
             status.save()
 
         # add to registry

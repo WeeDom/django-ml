@@ -7,9 +7,10 @@ from rest_framework import mixins
 from rest_framework.response import Response
 from .models import Endpoint
 from .serializers import EndpointSerializer
-from numpy.random import rand
 from rest_framework.exceptions import APIException
-
+from numpy.random import rand
+# from reviews.ml.registry import MLRegistry
+from reviews.wsgi import registry
 import json
 # from apps.ml.registry import MLRegistry
 # from apps.ml.registry import MLRequest
@@ -41,7 +42,6 @@ class PredictView(views.APIView):
             parent_endpoint__name=endpoint_name,
             status__status=algorithm_status,
             status__active=True)
-
         if algorithm_version is not None:
             algs = algs.filter(version=algorithm_version)
 
@@ -64,21 +64,22 @@ class PredictView(views.APIView):
 
         if algorithm_status == "ab_testing":
             alg_index = 0 if rand() < 0.5 else 1
-            algorithm_object = registry.endpoints[algs[alg_index].id]
-            prediction = algorithm_object.compute_prediction(request.data)
-            label = prediction["label"] if "label" in prediction else "error"
-            ml_request = MLRequest(
-                input_data=json.dumps(request.data),
-                full_response=prediction,
-                response=label,
-                feedback="",
-                parent_mlalgorithm=algs[alg_index],
-            )
-            ml_request.save()
+        algorithm_object = registry.endpoints[algs[alg_index].id]
+        prediction = algorithm_object.compute_prediction(request.data)
 
-            prediction["request_id"] = ml_request.id
+        label = prediction["label"] if "label" in prediction else "error"
+        ml_request = MLRequest(
+            input_data=json.dumps(request.data),
+            full_response=prediction,
+            response=label,
+            feedback="",
+            parent_mlalgorithm=algs[alg_index],
+        )
+        ml_request.save()
 
-            return Response(prediction)
+        prediction["request_id"] = ml_request.id
+
+        return Response(prediction)
 
 
 class ABTestViewSet(
